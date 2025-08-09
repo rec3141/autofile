@@ -1,6 +1,15 @@
 #!/bin/zsh
 set -euo pipefail
 
+# --- unified cleanup (handles both lock + temp) ---
+cleanup() {
+  local rc=$?
+  [[ -n "${batch:-}"   ]] && /bin/rm -rf -- "$batch"
+  [[ -n "${LOCKDIR:-}" ]] && /bin/rmdir "$LOCKDIR" 2>/dev/null || true
+  exit $rc
+}
+trap cleanup EXIT INT TERM
+
 # --- Paths / env ---
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin"
 PY="/opt/homebrew/bin/python3"
@@ -21,7 +30,6 @@ fi
 # --- single-instance guard + stale dialog cleanup ---
 LOCKDIR="${TMPDIR%/}/autofile.lock"
 until mkdir "$LOCKDIR" 2>/dev/null; do sleep 0.2; done
-trap 'rmdir "$LOCKDIR"' EXIT
 
 # Close any zombie "AutoFile Intake" dialogs left by a crashed run
 /usr/bin/pkill -f '/usr/local/bin/dialog .*AutoFile Intake' >/dev/null 2>&1 || true
@@ -85,7 +93,7 @@ def pick_select(key, default=""):
     return (v or default).strip()
 
 selected_project = pick_select("Project")
-typed_project    = (raw.get("New project (optional)") or "").strip()
+typed_project    = (raw.get("New Folder (overrides below)") or "").strip()
 project = typed_project or selected_project or "New-Project"
 
 apply_sel = pick_select("Apply","Apply now")
@@ -93,7 +101,7 @@ orig_sel  = pick_select("Originals","Copy")
 
 cfg = {
     "project": project,
-    "source": raw.get("Source label","Eric"),
+    "source": raw.get("Source","Eric"),
     "apply":  (apply_sel.lower().startswith("apply")),   # True if "Apply now"
     "move":   (orig_sel.lower().startswith("move")),     # True if "Move"
     "bundle": [k.split(": ",1)[1] for k,v in raw.items()
@@ -120,7 +128,6 @@ mkdir -p "$PROJROOT/$proj"
 WRAP_ROOT="${TMPDIR%/}/autofile"
 mkdir -p "$WRAP_ROOT"
 batch="$(/usr/bin/mktemp -d "$WRAP_ROOT/batch.XXXXXX")"
-trap '[[ -n "${batch:-}" ]] && /bin/rm -rf -- "$batch"' EXIT
 
 # Copy items in (keep originals; we only delete after success if "Move")
 ORIGS=()
