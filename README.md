@@ -79,6 +79,7 @@ AutoFile will place collaborator dumps under dated source folders, e.g.:
 * **macOS** (tested on Sequoia)
 * **Python 3.10+** (recommend Homebrew Python: `/opt/homebrew/bin/python3`)
 * **swiftDialog** for the one-window Quick Action UI
+   * Install at https://github.com/swiftDialog/swiftDialog
 
 * Optional (for AI classification):
 
@@ -202,7 +203,7 @@ LOG="$HOME/Library/Logs/AutoFile.log"
 mkdir -p "$HOME/Library/Logs" "$PROJROOT"
 
 if [[ -z "$DIALOG" || ! -x "$DIALOG" ]]; then
-  osascript -e 'display dialog "swiftDialog not found.\nInstall with:\nbrew install --cask swift-dialog" buttons {"OK"} default button 1' >/dev/null 2>&1 || true
+  osascript -e 'display dialog "swiftDialog not found.\nInstall at https://github.com/swiftDialog/swiftDialog" buttons {"OK"} default button 1' >/dev/null 2>&1 || true
   exit 1
 fi
 
