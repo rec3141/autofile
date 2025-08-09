@@ -78,11 +78,8 @@ AutoFile will place collaborator dumps under dated source folders, e.g.:
 
 * **macOS** (tested on Sequoia)
 * **Python 3.10+** (recommend Homebrew Python: `/opt/homebrew/bin/python3`)
-* **swiftDialog** for the one-window Quick Action UI:
+* **swiftDialog** for the one-window Quick Action UI
 
-  ```bash
-  brew install --cask swift-dialog
-  ```
 * Optional (for AI classification):
 
   * **LM Studio** running a model and its **OpenAI Compatible Server**
